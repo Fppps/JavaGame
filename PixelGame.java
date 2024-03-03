@@ -18,10 +18,27 @@ public class PixelGame extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Set background, blocks, and animate circle
-                setGameBackground("Images/water/Water.png");
-                setBlocks("Images/Gorund/Gorund.png");
-                animateCircle("Images/Guy/Circle.xml");
+                showLoadingScreen();
+                // Simulate loading process for 10-15 seconds
+                new Timer(1000, new ActionListener() {
+                    int progress = 0;
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        progress += 10;
+                        if (progress >= 100) {
+                            ((Timer) e.getSource()).stop();
+                            closeLoadingScreen();
+                            // Set background, blocks, and add the circle
+                            setGameBackground("Images/water/Water.png");
+                            setBlocks("Images/Gorund/Gorund.png");
+                            addCircle();
+                        } else {
+                            // Update progress bar
+                            updateProgressBar(progress);
+                        }
+                    }
+                }).start();
             }
         });
         add(startButton);
@@ -51,8 +68,54 @@ public class PixelGame extends JFrame {
                 updateGame();
             }
         });
-        if (updateAvailable) {
+        if(updateAvailable) {
             add(updateButton);
+        }
+    }
+
+    private void showLoadingScreen() {
+        JDialog loadingDialog = new JDialog(this, "Loading", true);
+        loadingDialog.setSize(300, 100);
+        loadingDialog.setLocationRelativeTo(this);
+
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(true);
+        progressBar.setString("Loading...");
+        loadingDialog.add(progressBar);
+
+        loadingDialog.setVisible(true);
+    }
+
+    private void closeLoadingScreen() {
+        // Close the loading screen dialog
+        for (Window window : Window.getWindows()) {
+            if (window instanceof JDialog) {
+                JDialog dialog = (JDialog) window;
+                if (dialog.getTitle().equals("Loading")) {
+                    dialog.dispose();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void updateProgressBar(int progress) {
+        // Update the progress bar in the loading screen
+        for (Window window : Window.getWindows()) {
+            if (window instanceof JDialog) {
+                JDialog dialog = (JDialog) window;
+                if (dialog.getTitle().equals("Loading")) {
+                    Component[] components = dialog.getContentPane().getComponents();
+                    for (Component component : components) {
+                        if (component instanceof JProgressBar) {
+                            ((JProgressBar) component).setValue(progress);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         }
     }
 
@@ -64,8 +127,9 @@ public class PixelGame extends JFrame {
         // Set blocks in the game
     }
 
-    private void animateCircle(String xmlPath) {
-        // Animate circle based on XML data
+    private void addCircle() {
+        // Add circle to the game
+        // Implement controls for circle movement
     }
 
     private void showOptions() {
@@ -73,9 +137,7 @@ public class PixelGame extends JFrame {
     }
 
     private void showCredits() {
-        // Show credits image
-        ImageIcon icon = new ImageIcon("Images/Credits/Whitty.png");
-        JOptionPane.showMessageDialog(this, icon, "Credits", JOptionPane.PLAIN_MESSAGE);
+        // Implement Credits menu
     }
 
     private void updateGame() {
